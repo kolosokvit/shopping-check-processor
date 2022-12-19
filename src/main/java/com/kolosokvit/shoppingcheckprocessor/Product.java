@@ -4,13 +4,13 @@ public class Product {
     private int id;
     private String description;
     private double price;
-    private boolean isOnDiscount;
+    private boolean promotionalProduct;
 
-    public Product(int id, String description, double price, boolean isOnDiscount) {
+    public Product(int id, String description, double price, boolean promotionalProduct) {
         this.id = id;
         this.description = description;
         this.price = price;
-        this.isOnDiscount = isOnDiscount;
+        this.promotionalProduct = promotionalProduct;
     }
 
     public int getId() {
@@ -25,7 +25,7 @@ public class Product {
         return price;
     }
 
-    public boolean isOnDiscount() {
-        return isOnDiscount;
+    public boolean isPromotionalProduct() {
+        return promotionalProduct;
     }
 }
