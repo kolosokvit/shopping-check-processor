@@ -1,4 +1,4 @@
-package com.kolosokvit.shoppingcheckprocessor;
+package com.kolosokvit.shoppingcheckprocessor.shop;
 
 public class Product {
     private int id;

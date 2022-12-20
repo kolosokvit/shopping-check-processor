@@ -1,4 +1,4 @@
-package com.kolosokvit.shoppingcheckprocessor;
+package com.kolosokvit.shoppingcheckprocessor.shop;
 
 import java.util.HashMap;
 import java.util.Map;

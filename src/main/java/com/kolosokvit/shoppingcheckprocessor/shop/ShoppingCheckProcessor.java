@@ -1,4 +1,4 @@
-package com.kolosokvit.shoppingcheckprocessor;
+package com.kolosokvit.shoppingcheckprocessor.shop;
 
 import com.kolosokvit.shoppingcheckprocessor.exceptions.CustomerWithNoPurchasesException;
 import com.kolosokvit.shoppingcheckprocessor.exceptions.InputFileIsEmptyException;
@@ -21,7 +21,7 @@ public class ShoppingCheckProcessor {
         if (data.length == 1 && new File(data[0]).exists()) {
             try (FileReader fileReader = new FileReader(data[0]); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
                 String line = bufferedReader.readLine();
-                if (!line.isEmpty()) {
+                if (line != null &&! line.isEmpty()) {
                     readData(line.split(" "));
                 } else {
                     throw new InputFileIsEmptyException("Input file is empty!");
@@ -120,16 +120,7 @@ public class ShoppingCheckProcessor {
         return customerDiscountCard;
     }
 
-    public static void main(String[] args) {
-        String[] data = new String[] {"1-5", "3-5", "2-2", "4-2", "card-1111"};
-        //String[] data = new String[] {"/home/vitali/projects/shopping-check-processor/src/main/resources/TestData.txt"};
-        ShoppingCheckProcessor processor = new ShoppingCheckProcessor();
-        try {
-            processor.readData(data);
-            processor.printCheckToConsole();
-            processor.printCheckToFile();
-        } catch (InputFileIsEmptyException | ProductWithInvalidIDException | CustomerWithNoPurchasesException e) {
-            e.printStackTrace();
-        }
+    public List<String> getCheck() {
+        return check;
     }
 }
