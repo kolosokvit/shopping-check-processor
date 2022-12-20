@@ -2,19 +2,22 @@ package com.kolosokvit.shoppingcheckprocessor;
 
 import com.kolosokvit.shoppingcheckprocessor.exceptions.CustomerWithNoPurchasesException;
 import com.kolosokvit.shoppingcheckprocessor.exceptions.InputFileIsEmptyException;
+import com.kolosokvit.shoppingcheckprocessor.exceptions.ProductWithInvalidIDException;
 import com.kolosokvit.shoppingcheckprocessor.utils.DiscountCalculator;
 import com.kolosokvit.shoppingcheckprocessor.utils.LineFormatter;
 import com.kolosokvit.shoppingcheckprocessor.utils.NumberRounder;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class ShoppingCheckProcessor {
     private List<Purchase> customerPurchases = new ArrayList<>();
     private DiscountCard customerDiscountCard = null;
     private List<String> check = new ArrayList<>();
 
-    public void readData(String[] data) {
+    public void readData(String[] data) throws InputFileIsEmptyException, ProductWithInvalidIDException {
         if (data.length == 1 && new File(data[0]).exists()) {
             try (FileReader fileReader = new FileReader(data[0]); BufferedReader bufferedReader = new BufferedReader(fileReader)) {
                 String line = bufferedReader.readLine();
@@ -24,7 +27,7 @@ public class ShoppingCheckProcessor {
                     throw new InputFileIsEmptyException("Input file is empty!");
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         } else {
             for (String s : data) {
@@ -32,13 +35,16 @@ public class ShoppingCheckProcessor {
                 if (array[0].equalsIgnoreCase("card")) {
                     customerDiscountCard = ShopDataBase.discountCards.get(array[1]);
                 } else {
+                    if (!ShopDataBase.products.containsKey(Integer.parseInt(array[0]))) {
+                        throw new ProductWithInvalidIDException("Product with invalid ID.");
+                    }
                     customerPurchases.add(new Purchase(ShopDataBase.products.get(Integer.parseInt(array[0])), Integer.parseInt(array[1])));
                 }
             }
         }
     }
 
-    public void generateCheck() {
+    public void generateCheck() throws CustomerWithNoPurchasesException {
         if (!customerPurchases.isEmpty()) {
             check.add("--------------------HEADER--------------------");
             check.add(Calendar.getInstance().getTime().toString());
@@ -80,20 +86,29 @@ public class ShoppingCheckProcessor {
     }
 
     public void printCheckToConsole() {
-        generateCheck();
+        try {
+            generateCheck();
+        } catch (CustomerWithNoPurchasesException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
         for (String s : check) {
             System.out.println(s);
         }
     }
 
-    public void printCheckToFile() {
-        File outputCheck = new File("check.txt");
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputCheck))) {
-            for (String s : check) {
-                bufferedWriter.write(s + System.getProperty("line.separator"));
+    public void printCheckToFile() throws CustomerWithNoPurchasesException {
+        if (!customerPurchases.isEmpty()) {
+            File outputCheck = new File("check.txt");
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputCheck))) {
+                for (String s : check) {
+                    bufferedWriter.write(s + System.getProperty("line.separator"));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } else {
+            throw new CustomerWithNoPurchasesException("Customer have no purchases. Nothing to print.");
         }
     }
 
@@ -106,11 +121,15 @@ public class ShoppingCheckProcessor {
     }
 
     public static void main(String[] args) {
-        //String[] data = new String[] {"1-5", "3-5", "2-2", "4-2", "card-1111"};
-        String[] data = new String[] {"/home/vitali/projects/shopping-check-processor/src/main/resources/TestData.txt"};
+        String[] data = new String[] {"1-5", "3-5", "2-2", "4-2", "card-1111"};
+        //String[] data = new String[] {"/home/vitali/projects/shopping-check-processor/src/main/resources/TestData.txt"};
         ShoppingCheckProcessor processor = new ShoppingCheckProcessor();
-        processor.readData(data);
-        processor.printCheckToConsole();
-        processor.printCheckToFile();
+        try {
+            processor.readData(data);
+            processor.printCheckToConsole();
+            processor.printCheckToFile();
+        } catch (InputFileIsEmptyException | ProductWithInvalidIDException | CustomerWithNoPurchasesException e) {
+            e.printStackTrace();
+        }
     }
 }
