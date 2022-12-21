@@ -99,7 +99,7 @@ public class ShoppingCheckProcessor {
 
     public void printCheckToFile() throws CustomerWithNoPurchasesException {
         if (!customerPurchases.isEmpty()) {
-            File outputCheck = new File("check.txt");
+            File outputCheck = new File("output/check.txt");
             try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputCheck))) {
                 for (String s : check) {
                     bufferedWriter.write(s + System.getProperty("line.separator"));
