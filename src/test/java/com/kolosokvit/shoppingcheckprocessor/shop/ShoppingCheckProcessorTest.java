@@ -5,22 +5,19 @@ import com.kolosokvit.shoppingcheckprocessor.exceptions.CustomerWithNoPurchasesE
 import com.kolosokvit.shoppingcheckprocessor.exceptions.InputFileIsEmptyException;
 import com.kolosokvit.shoppingcheckprocessor.exceptions.ProductWithInvalidIDException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class ShoppingCheckProcessorTest {
 
     @Test
     void shouldThrowInputFileIsEmptyException() {
         ShoppingCheckProcessor checkProcessor = new ShoppingCheckProcessor();
-        InputFileIsEmptyException thrown = Assertions.assertThrows(InputFileIsEmptyException.class, () -> checkProcessor.readData(new String[] {"/home/vitali/projects/shopping-check-processor/src/main/resources/EmptyTestFile.txt"}));
+        InputFileIsEmptyException thrown = Assertions.assertThrows(InputFileIsEmptyException.class, () -> checkProcessor.readData(new String[] {"/home/vitali/projects/shopping-check-processor/src/test/resources/EmptyTestFile.txt"}));
         Assertions.assertEquals("Input file is empty!", thrown.getMessage());
     }
 
@@ -47,7 +44,7 @@ class ShoppingCheckProcessorTest {
         expectedCustomerPurchases.add(new Purchase(ShopDataBase.products.get(2), 2));
         expectedCustomerPurchases.add(new Purchase(ShopDataBase.products.get(1), 1));
         try {
-            checkProcessor.readData(new String[] {"/home/vitali/projects/shopping-check-processor/src/main/resources/TestData.txt"});
+            checkProcessor.readData(new String[] {"/home/vitali/projects/shopping-check-processor/src/test/resources/TestData.txt"});
             List<Purchase> actualCustomerPurchase = checkProcessor.getCustomerPurchases();
             for (int i =  0; i < actualCustomerPurchase.size(); i++) {
                 Assertions.assertEquals(expectedCustomerPurchases.get(i), actualCustomerPurchase.get(i));
@@ -88,7 +85,7 @@ class ShoppingCheckProcessorTest {
         ShoppingCheckProcessor checkProcessor = new ShoppingCheckProcessor();
         List<String> expectedCheck = new ArrayList<>();
         try {
-            checkProcessor.readData(new String[]{"/home/vitali/projects/shopping-check-processor/src/main/resources/TestData.txt"});
+            checkProcessor.readData(new String[]{"/home/vitali/projects/shopping-check-processor/src/test/resources/TestData.txt"});
         } catch (InputFileIsEmptyException | ProductWithInvalidIDException e) {
             e.printStackTrace();
         }
@@ -101,7 +98,7 @@ class ShoppingCheckProcessorTest {
         System.setOut(new PrintStream(outContent));
         ShoppingCheckProcessor checkProcessor = new ShoppingCheckProcessor();
         try {
-            checkProcessor.readData(new String[]{"/home/vitali/projects/shopping-check-processor/src/main/resources/TestData.txt"});
+            checkProcessor.readData(new String[]{"/home/vitali/projects/shopping-check-processor/src/test/resources/TestData.txt"});
         } catch (InputFileIsEmptyException | ProductWithInvalidIDException e) {
             e.printStackTrace();
         }
@@ -132,8 +129,8 @@ class ShoppingCheckProcessorTest {
         expectedCheck.add("Loyalty program discount:               -1.16");
         expectedCheck.add("Total:                                   35.69");
 
-        AppRunner.main(new String[]{"/home/vitali/projects/shopping-check-processor/src/main/resources/TestData.txt"});
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("check.txt"))) {
+        AppRunner.main(new String[]{"/home/vitali/projects/shopping-check-processor/src/test/resources/TestData.txt"});
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("output/check.txt"))) {
             String actualCheckLine = null;
             int lineCounter = 0;
             while ((actualCheckLine = bufferedReader.readLine()) != null) {
